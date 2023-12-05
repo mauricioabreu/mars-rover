@@ -42,7 +42,7 @@ class Rover:
         elif self.heading == DIRECTIONS["S"]:
             self.position.y -= 1
         else:
-            self.heading.x -= 1
+            self.position.x -= 1
 
         return True
 
@@ -54,6 +54,11 @@ class Rover:
             self.turn_right()
         else:
             self.move()
+
+    def process_commands(self, commands):  # str
+        # LMLMLMLMM
+        for command in commands:
+            self.process_command(command)
 
 
 class TestRover(unittest.TestCase):
@@ -118,6 +123,20 @@ class TestRover(unittest.TestCase):
         rover.process_command(command)
 
         self.assertEqual(rover.position.y, 3)
+
+    def test_process_commands(self):
+        commands = "LMLMLMLMM"
+        plateau = Plateau(5, 5)
+        rover = Rover(1, 2, "N", plateau)
+
+        rover.process_commands(commands)
+
+        # 1 3 N
+        self.assertEqual(rover.position.x, 1)
+        self.assertEqual(rover.position.y, 3)
+        self.assertEqual(rover.heading, DIRECTIONS["N"])
+
+        # 5 1 E
 
 
 class PlateauTest(unittest.TestCase):
