@@ -3,11 +3,27 @@ import unittest
 DIRECTIONS = {"N": 1, "E": 2, "S": 3, "W": 4}
 
 
-class Rover:
-    def __init__(self, x, y, heading="N"):
+class Plateau:
+    def __init__(self, height, width):
+        self.height = height
+        self.width = width
+
+    def can_move(self, position):
+        # check inbounds
+        return 0 <= position.x <= self.width and 0 <= position.y <= self.height
+
+
+class Position:
+    def __init__(self, x, y):
         self.x = x
         self.y = y
+
+
+class Rover:
+    def __init__(self, x, y, heading, plateau):
+        self.position = Position(x, y)
         self.heading = DIRECTIONS[heading]  # int
+        self.plateau = plateau
 
     def turn_left(self):
         self.heading = DIRECTIONS["W"] if (self.heading - 1) < 1 else self.heading - 1
@@ -15,10 +31,26 @@ class Rover:
     def turn_right(self):
         self.heading = DIRECTIONS["N"] if (self.heading + 1) > 4 else self.heading + 1
 
+    def move(self):
+        if not self.plateau.can_move(self.position):
+            return False
+
+        if self.heading == DIRECTIONS["N"]:
+            self.position.y += 1
+        elif self.heading == DIRECTIONS["E"]:
+            self.position.x += 1
+        elif self.heading == DIRECTIONS["S"]:
+            self.position.y -= 1
+        else:
+            self.heading.x -= 1
+
+        return True
+
 
 class TestRover(unittest.TestCase):
     def test_turn_left(self):
-        rover = Rover(1, 2, "N")
+        plateau = Plateau(5, 5)
+        rover = Rover(1, 2, "N", plateau)
         rover.turn_left()
         self.assertEqual(rover.heading, DIRECTIONS["W"])
 
@@ -26,7 +58,8 @@ class TestRover(unittest.TestCase):
         self.assertEqual(rover.heading, DIRECTIONS["S"])
 
     def test_turn_right(self):
-        rover = Rover(1, 2, "N")
+        plateau = Plateau(5, 5)
+        rover = Rover(1, 2, "N", plateau)
         rover.turn_right()
         self.assertEqual(rover.heading, DIRECTIONS["E"])
 
@@ -36,12 +69,47 @@ class TestRover(unittest.TestCase):
 
         self.assertEqual(rover.heading, DIRECTIONS["N"])
 
+    def test_move(self):
+        plateau = Plateau(5, 5)
+        rover = Rover(1, 2, "N", plateau)
+        self.assertEqual(rover.position.x, 1)
+        self.assertEqual(rover.position.y, 2)
+
+        rover.move()
+
+        self.assertEqual(rover.position.y, 3)
+
+    def test_can_not_move(self):
+        plateau = Plateau(5, 5)
+        rover = Rover(1, 6, "N", plateau)
+        self.assertEqual(rover.move(), False)
+
+
+class PlateauTest(unittest.TestCase):
+    def test_can_move(self):
+        plateau = Plateau(5, 5)
+        position = Position(1, 5)
+        self.assertTrue(plateau.can_move(position))
+
+    def test_can_not_move(self):
+        plateau = Plateau(5, 5)
+        position = Position(1, 6)
+        self.assertFalse(plateau.can_move(position))
+
 
 if __name__ == "__main__":
     unittest.main()
 
+# # # # # #
+# # R # # #
+# # # # # #
+# # # # # #
 
-# # # #
-# # X #
-# # # #
-# # # #
+# N -> y + 1
+# E -> x + 1
+# S -> y - 1
+# W -> x - 1
+
+
+# Turn left and right
+#
