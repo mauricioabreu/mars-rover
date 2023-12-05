@@ -46,6 +46,15 @@ class Rover:
 
         return True
 
+    def process_command(self, command):
+        # command L, R, M
+        if command == "L":
+            self.turn_left()
+        elif command == "R":
+            self.turn_right()
+        else:
+            self.move()
+
 
 class TestRover(unittest.TestCase):
     def test_turn_left(self):
@@ -83,6 +92,32 @@ class TestRover(unittest.TestCase):
         plateau = Plateau(5, 5)
         rover = Rover(1, 6, "N", plateau)
         self.assertEqual(rover.move(), False)
+
+    def test_process_L_command(self):
+        command = "L"
+        plateau = Plateau(5, 5)
+        rover = Rover(1, 2, "N", plateau)
+        rover.process_command(command)
+        self.assertEqual(rover.heading, DIRECTIONS["W"])
+
+    def test_process_R_command(self):
+        command = "R"
+        plateau = Plateau(5, 5)
+        rover = Rover(1, 2, "N", plateau)
+        rover.process_command(command)
+        self.assertEqual(rover.heading, DIRECTIONS["E"])
+
+    def test_process_M_command(self):
+        command = "M"
+        plateau = Plateau(5, 5)
+        rover = Rover(1, 2, "N", plateau)
+
+        self.assertEqual(rover.position.x, 1)
+        self.assertEqual(rover.position.y, 2)
+
+        rover.process_command(command)
+
+        self.assertEqual(rover.position.y, 3)
 
 
 class PlateauTest(unittest.TestCase):
